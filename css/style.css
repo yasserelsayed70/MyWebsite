@@ -102,7 +102,7 @@ label {
 }
 header
 {
-    background:-webkit-linear-gradient(top, rgba(0,0,0,0.8), rgba(0,0,0,0)) ,url("../images/backgroundedited.jpg");
+    background:-webkit-linear-gradient(top, rgba(0,0,0,0.8), rgba(0,0,0,0)) ,url("../images/HeaderBg.jpg");
     background-size:cover;
     position: relative;
     height:660px;
@@ -196,11 +196,11 @@ header > nav > label
     letter-spacing: 5px;
     font-size: 15px;
 }
-.info > div > a
+.SocialIcons > a
 {   
     text-decoration: none;
 }
-.info > div > div
+.SocialIcons > div
 {
     border: solid 2px #ffffff;
     margin-bottom:20px;
@@ -209,18 +209,18 @@ header > nav > label
     margin: 0 5px 0 5px;
     transition: 0.2s;
 }
-.info  > div > div > a > img
+.SocialIcons > div > a > img
 {
     filter: grayscale(80%);
     padding:10px;
     transition:1s;
     height:35px;
 }
-.info > div > div:hover
+.SocialIcons > div:hover
 {
     border-color: #950012;
 }
-.info > div > div:hover .brands-pics
+.SocialIcons > div:hover .brands-pics
 {
     filter:none;
 }
@@ -260,6 +260,8 @@ header > nav > label
     display: inline-block;
     font-family: 'Open Sans', sans-serif;
 }
+
+
 /****** End Header content information And my id ******/
 
 /**************************************** end header ***************************************/
@@ -319,6 +321,7 @@ header > nav > label
     background-color: #E4E4E4;
     height: 10px;
     border-radius: 2px;
+    margin-bottom: 30px;
 }
 .myskills > div > div > div
 {
@@ -349,7 +352,9 @@ header > nav > label
 }
 .myskills > div > h6
 {
-    margin-bottom: 0px;
+    margin-bottom: 5px;
+    font-size: 15px;
+    text-align: center;
 }
 .handred
 {
@@ -587,12 +592,14 @@ header > nav > label
 .theform
 {
     margin-bottom:80px;
+    text-decoration: none;
 }
 .theform > div:nth-child(1)
 {
-    background-color:#00BDBD;
+    background-color:#950012;
     margin:0;
     padding:35px;
+    height: 280px;
 }
 .theform > div:nth-child(2)
 {
@@ -643,7 +650,7 @@ textarea
 }
 .theform > div > div > h6
 {
-    color:#000;
+    color:#00a1a1;
     font-family: 'Oswald', sans-serif;
     font-weight: 500;
     font-size:16px;
@@ -661,7 +668,7 @@ textarea
 }
 .theform > div > div > p > span
 {
-    color:#045858;
+    color:#ffffff;
     font-size:12px;
     font-weight: bold;
     display: inline-block;
@@ -669,9 +676,29 @@ textarea
     width:76px;
     font-family: 'Open Sans', sans-serif;
 }
-iframe
+.theform > div > div > p > a
 {
-    height:507px;
+    color:white;
+    text-decoration: none;
+}
+.theform > div > div > p > a: hover
+{
+    color:#ff9191;
+}
+.theform a:hover
+{
+    color: #ff9191;
+    transition: 0.2s;
+}
+.SocialIconsContactMe
+{
+    margin-top: 30px;
+    text-align: center; 
+}
+.ContactMeImg
+{
+    height:280px;
+    width: 100%;
 }
 /**************************************** start footer ***************************************/
 footer
