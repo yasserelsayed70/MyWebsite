@@ -228,9 +228,10 @@ header > nav > label
 {
     padding:5%;
     text-align: center;
-    background-color: rgba(0, 0, 0, .8);
+    background-color: rgba(0, 0, 0, .9);
     color: white;
     margin:5% 0 10% 0;
+    box-shadow: 0px 10px 12px 0px #00000069;
 }
 .myid > img
 {
@@ -568,11 +569,15 @@ header > nav > label
 
 /****** Contact Us ******/
 
-.contact
+.CMContainer
+{
+    padding-bottom: 90px;
+}
+.ContactHeader
 {
     margin-top:90px;
 }
-.contact > h6
+.ContactHeader > h6
 {
     font-family: 'Oswald', sans-serif;
     color: #950012;
@@ -580,7 +585,7 @@ header > nav > label
     letter-spacing: 3px;
     margin: 0 0 2px 3px;
 }
-.contact > h2
+.ContactHeader > h2
 {
     color:black;
     margin-top:0;
@@ -591,8 +596,8 @@ header > nav > label
 /****** the form *****/
 .theform
 {
-    margin-bottom:80px;
     text-decoration: none;
+    
 }
 .theform > div:nth-child(1)
 {
@@ -705,12 +710,12 @@ footer
 {
     text-align: center;
     height:50px;
-    background-color:#2b2b2b;
+    background-color:#000000;
     color:#FFF;
     padding-top:15px;
 }
 footer > span
 {
-    color:#00BDBD;
+    color:#f16475;
 }
 /**************************************** End footer ***************************************/
