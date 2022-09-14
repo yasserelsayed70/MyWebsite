@@ -202,7 +202,6 @@ header > nav > label
 }
 .SocialIcons > div
 {
-    border: solid 2px #ffffff;
     margin-bottom:20px;
     display: inline-block;
     transition:1s;
@@ -211,18 +210,9 @@ header > nav > label
 }
 .SocialIcons > div > a > img
 {
-    filter: grayscale(80%);
     padding:10px;
     transition:1s;
-    height:35px;
-}
-.SocialIcons > div:hover
-{
-    border-color: #950012;
-}
-.SocialIcons > div:hover .brands-pics
-{
-    filter:none;
+    height:45px;
 }
 .myid
 {
