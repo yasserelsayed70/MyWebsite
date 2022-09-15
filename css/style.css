@@ -222,6 +222,7 @@ header > nav > label
     color: white;
     margin:5% 0 10% 0;
     box-shadow: 0px 10px 12px 0px #00000069;
+    font-size: 12px
 }
 .myid > img
 {
@@ -250,6 +251,17 @@ header > nav > label
     width:76px;
     display: inline-block;
     font-family: 'Open Sans', sans-serif;
+}
+.myid a
+{
+    color:white;
+    text-decoration: none;
+    font-family: 'Michroma', sans-serif;
+}
+.myid a:hover
+{
+    color: #ff9191;
+    transition: 0.2s;
 }
 
 
@@ -290,7 +302,8 @@ header > nav > label
 .about-me > p
 {
     color:#8b8a8a;
-    line-height: 2
+    line-height: 2;
+    text-align: justify;
 }
 
 /****** End About me ******/
@@ -323,21 +336,25 @@ header > nav > label
 }
 .myskills > div:nth-child(2) > div > div
 {
-    width:90%;
+    width:85%;
 }
 .myskills > div:nth-child(3) > div > div
 {
-    width:70%;
+    width:60%;
 }
 .myskills > div:nth-child(4) > div > div
 {
-    width:60%;
+    width:80%;
 }
 .myskills > div:nth-child(5) > div > div
 {
-    width:20%;
+    width:70%;
 }
 .myskills > div:nth-child(6) > div > div
+{
+    width:60%;
+}
+.myskills > div:nth-child(7) > div > div
 {
     width:50%;
 }
@@ -430,14 +447,26 @@ header > nav > label
     color:#00a1a1;
     margin-bottom:30px;
 }
-.right-stage1 > p
+.right-stage1 > p, .right-stage1 li
 {
     color:#8b8a8a;
     line-height: 1.7;
+    text-align: justify;
+    
+}
+.right-stage1 li
+{
+    margin-left: 40px;
+    list-style:  square;
 }
 
 /*secound stage*/
-
+.left-stage2.small-case
+{
+    padding:5% 5% 0 10%;
+    text-align: left;
+    border-left: 1px solid #a2a2a2;
+}
 .case-hover2:hover .case
 {
     font-size:22px;
@@ -454,16 +483,21 @@ header > nav > label
     color:#00a1a1;
     margin-bottom:30px;
 }
-.left-stage2 > p
+.left-stage2 > p, .left-stage2 li
 {
     color:#8b8a8a;
     line-height: 1.7;
+    
+}
+.left-stage2 li
+{
+    list-style: inside square;
 }
 .right-stage2
 {
     padding:5% 10% 0 10%;
     border-left:1px solid #a2a2a2; 
-    min-height:232.5px;
+    min-height:246.5px;
 }
 .right-stage2 > h4
 {
@@ -534,7 +568,7 @@ header > nav > label
 {
     border:1px solid rgb(230, 229, 229);
     background-color: #ffffff;
-    padding:5% 3%;
+    padding:5% 3% 0 3%;
     min-height:358px
 }
 .projects-row > div:nth-child(2) > h4
@@ -548,11 +582,26 @@ header > nav > label
 {
     color:#950012;
 }
+.projects-row iframe
+{
+    min-height: 358px;
+    width: 100%;
+}
 .projects-row > div:nth-child(2) > p
 {
     line-height: 37px;
     color:#8b8a8a;
-    
+} 
+.projects-row img
+{
+    position: absolute;
+    right: 30px;
+    bottom: 30px;
+    height: 48px;
+}
+.projects-row .oculus
+{
+    right: 98px;
 }
 
 /****** End FEATURED PROJECTS ******/
@@ -675,10 +724,6 @@ textarea
 {
     color:white;
     text-decoration: none;
-}
-.theform > div > div > p > a: hover
-{
-    color:#ff9191;
 }
 .theform a:hover
 {
