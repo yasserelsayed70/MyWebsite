@@ -257,6 +257,8 @@ header > nav > label
     color:white;
     text-decoration: none;
     font-family: 'Michroma', sans-serif;
+    font-size: 10px;
+    position: absolute;
 }
 .myid a:hover
 {
