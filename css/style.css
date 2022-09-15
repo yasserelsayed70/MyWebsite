@@ -179,6 +179,7 @@ header > nav > label
     padding: 5%;
     text-align: center;
     background-color: rgba(0, 0, 0, .5);
+    border-radius: 10px;
 }
 .info> h1
 {
@@ -222,13 +223,15 @@ header > nav > label
     color: white;
     margin:5% 0 10% 0;
     box-shadow: 0px 10px 12px 0px #00000069;
-    font-size: 12px
+    font-size: 12px;
+    border-radius: 10px;
 }
 .myid > img
 {
     height:180px;
     border:solid 2px #e7e8e8;
-    padding:2px
+    padding:2px;
+    border-radius: 180px;
 }
 .myid > hr
 {
@@ -303,7 +306,7 @@ header > nav > label
 }
 .about-me > p
 {
-    color:#8b8a8a;
+    color:#7e7e7e;
     line-height: 2;
     text-align: justify;
 }
@@ -451,7 +454,7 @@ header > nav > label
 }
 .right-stage1 > p, .right-stage1 li
 {
-    color:#8b8a8a;
+    color:#7e7e7e;
     line-height: 1.7;
     text-align: justify;
     
@@ -487,7 +490,7 @@ header > nav > label
 }
 .left-stage2 > p, .left-stage2 li
 {
-    color:#8b8a8a;
+    color:#7e7e7e;
     line-height: 1.7;
     
 }
@@ -538,7 +541,7 @@ header > nav > label
 }
 .projects
 {
-    padding: 70px 0;
+    padding: 70px 0px 20px 0;
 }
 .projects > h6
 {
@@ -558,7 +561,7 @@ header > nav > label
 }
 .projects-row
 {
-    margin-bottom:20px
+    margin-bottom:50px;
 }
 .projects-row > div:nth-child(1)
 {
@@ -592,7 +595,7 @@ header > nav > label
 .projects-row > div:nth-child(2) > p
 {
     line-height: 37px;
-    color:#8b8a8a;
+    color:#7e7e7e;
 } 
 .projects-row img
 {
@@ -694,14 +697,14 @@ textarea
 {
     outline: none;
 }
-.theform > div > div > h6
+.theform > div > div > h4
 {
-    color:#00a1a1;
+    color:#02c7c7;
     font-family: 'Oswald', sans-serif;
+    font-size: 21px;
     font-weight: 500;
-    font-size:16px;
     text-transform: capitalize;
-    margin-top:17px;
+    margin-bottom: 20px;
     line-height:1.1;
 }
 .theform > div > div > p
