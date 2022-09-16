@@ -231,7 +231,7 @@ header > nav > label
     height:180px;
     border:solid 2px #e7e8e8;
     padding:2px;
-    border-radius: 180px;
+    border-radius: 90px;
 }
 .myid > hr
 {
@@ -748,14 +748,20 @@ textarea
 /**************************************** start footer ***************************************/
 footer
 {
+    font-family: 'Michroma', sans-serif;
     text-align: center;
-    height:50px;
-    background-color:#000000;
-    color:#FFF;
+    height:70px;
+    background-color:#080808;
+    color:#e3e3e3;
     padding-top:15px;
+    position: static;
+    left: 0;
+    bottom: 0;
+    width: 100%;
 }
 footer > span
 {
     color:#f16475;
+    font-family: 'Michroma', sans-serif;    
 }
 /**************************************** End footer ***************************************/
