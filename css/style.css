@@ -90,7 +90,7 @@ input:checked ~ .portfolio
 
 input:checked ~ label > .nav-icon:after, 
 input:checked ~ label > .nav-icon:before, 
-input:checked ~     label > .nav-icon div
+input:checked ~ label > .nav-icon div
 {
     background-color:#e6e6e6;
 }
@@ -336,7 +336,7 @@ header > nav > label
     width: 100%;
     background-color: #E4E4E4;
     height: 10px;
-    border-radius: 2px;
+    border-radius: 10px;
     margin-bottom: 30px;
 }
 .myskills > div > div > div
@@ -344,7 +344,7 @@ header > nav > label
     background-color: #950012;
     float:left;
     height:inherit;
-    border-radius: 2px;
+    border-radius: 10px;
 }
 .myskills > div:nth-child(2) > div > div
 {
