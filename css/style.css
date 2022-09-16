@@ -748,6 +748,7 @@ textarea
 /**************************************** start footer ***************************************/
 footer
 {
+    font-size: 12px;
     font-family: 'Michroma', sans-serif;
     text-align: center;
     height:70px;
