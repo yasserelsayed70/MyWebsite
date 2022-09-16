@@ -82,15 +82,17 @@ input[type=checkbox]
 
 input:checked ~ .portfolio 
 { 
+/*
     right: 300px;
     left:-300px;
+*/
 }
 
 input:checked ~ label > .nav-icon:after, 
 input:checked ~ label > .nav-icon:before, 
 input:checked ~     label > .nav-icon div
 {
-    background-color:#e6e6e6 ;
+    background-color:#e6e6e6;
 }
 input:checked ~ .sidebar 
 {
