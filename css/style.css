@@ -75,20 +75,25 @@ body
     transition: all 0.5s ease;
     background-color: white;
 }
-input[type=checkbox] {
+input[type=checkbox] 
+{
    display: none;
 }
 
-input:checked ~ .portfolio { 
+input:checked ~ .portfolio 
+{ 
     right: 300px;
     left:-300px;
 }
 
-input:checked ~ label {
-    right: 320px;
-    padding-right: 25px
+input:checked ~ label > .nav-icon:after, 
+input:checked ~ label > .nav-icon:before, 
+input:checked ~     label > .nav-icon div
+{
+    background-color:#e6e6e6 ;
 }
-input:checked ~ .sidebar {
+input:checked ~ .sidebar 
+{
     left:auto;
     width:300px;
 }
