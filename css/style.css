@@ -410,37 +410,11 @@ header > nav > label
 }
 
 /*first stage*/
-.right-stage0
+.case-hover1:hover .case
 {
-    padding:8% 10% 0 10%;
-    border-left:1px solid #a2a2a2; 
-    min-height:376.5px;
-}
-.right-stage0 > h4
-{
-    font-family: 'Oswald', sans-serif;
-    display:inline-block;
-    margin-left:10px;
-    color:black;
-}
-.right-stage0 > .pointer
-{
-    transform: rotate(180deg);
-    color:#950012;
-    font-size: 20px;
-}
-.right-stage0 > .case
-{
-    position:absolute;
-    font-size:18px;
-    padding:18px;
-    background-color: #950012;
-    color:white;
-    border-radius: 50%;
-    transform:translateY(-50%) translateX(-50%);
-    left:0px;
-    top:30%;
-    transition:.5s;
+    font-size:22px;
+    padding:22px;
+    right:-67px
 }
 .left-stage1
 {
@@ -535,6 +509,11 @@ header > nav > label
     padding:5% 10% 0 10%;
     border-left:1px solid #a2a2a2; 
     min-height:246.5px;
+}
+.stritchedBox
+{
+    padding:8% 10% 0 10%;
+    min-height:376.5px;
 }
 .right-stage2 > h4
 {
