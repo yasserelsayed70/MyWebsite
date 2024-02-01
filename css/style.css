@@ -10,6 +10,10 @@ body
 {
     background-color: white;
 }
+html
+{
+    scroll-behavior: smooth;
+}
 
 /*@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');*/
 /**************************************** start header ***************************************/
