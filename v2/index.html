@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Yasser Badr · Multiplayer Gameplay Programmer</title>
+  <meta name="description" content="Yasser Badr — Multiplayer Gameplay Programmer (Unity, Photon Fusion, PlayFab, Steamworks). Server-authoritative netcode, client-side prediction, lag compensation. Open to relocation to Spain and Germany." />
+  <meta property="og:title" content="Yasser Badr · Multiplayer Gameplay Programmer" />
+  <meta property="og:description" content="Join the lobby. Unity · Photon Fusion · PlayFab · Steamworks. Open to relocation: Spain · Germany." />
+  <meta property="og:type" content="website" />
+  <meta name="theme-color" content="#070b14" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/lobby.css" />
+</head>
+<body>
+  <!-- ============ BOOT ============ -->
+  <div id="boot" class="boot">
+    <div class="boot-inner">
+      <div class="boot-logo" data-text="YB">YB</div>
+      <div class="boot-lines" id="bootLines"></div>
+      <div class="boot-bar"><span id="bootBar"></span></div>
+      <p class="boot-tip" id="bootTip"></p>
+    </div>
+    <button class="boot-skip" id="bootSkip" type="button">Skip</button>
+  </div>
+
+  <!-- ============ LOBBY ============ -->
+  <div id="lobby" class="lobby">
+    <div class="bg" aria-hidden="true">
+      <div class="bg-glow"></div>
+      <div class="bg-word">MULTIPLAYER</div>
+      <div class="bg-beams"><i></i><i></i><i></i><i></i></div>
+      <div class="bg-floor"></div>
+      <canvas id="dust" class="bg-dust"></canvas>
+    </div>
+
+    <header class="topbar ui">
+      <div class="brand">YB</div>
+      <nav class="tabs">
+        <button class="tab active" type="button">Lobby</button>
+        <button class="tab" type="button" data-action="play">Career</button>
+        <button class="tab" type="button" data-action="locker">Locker</button>
+        <button class="tab" type="button" data-action="quick">Quick View</button>
+      </nav>
+      <div class="status">
+        <span class="ping" id="ping" title="Your real latency to this site"><i></i><b id="pingVal">--</b> ms</span>
+        <span class="region">EU</span>
+      </div>
+    </header>
+
+    <aside class="player-card ui" id="playerCard"></aside>
+
+    <aside class="locker ui" id="lockerPanel">
+      <h3 class="panel-title">Loadout</h3>
+      <div class="loadout" id="loadout"></div>
+    </aside>
+
+    <main class="stage">
+      <div class="pad" id="pad"><i class="pad-glow"></i><i class="pad-ticks"></i><i class="pad-ring"></i><i class="pad-arcs"></i><i class="pad-pulse"></i><i class="pad-flash"></i></div>
+      <canvas id="character" class="character" aria-label="Yasser Badr as a game character"></canvas>
+      <img id="characterFallback" class="character fallback" src="assets/idle-poster.webp" alt="Yasser Badr as a game character" hidden />
+      <div class="nameplate"><span class="ready">●</span> <b id="nameplate"></b></div>
+      <button class="slot slot-l ui" type="button" data-action="party" aria-label="Join party"><span>+</span><small>Join party</small></button>
+      <button class="slot slot-r ui" type="button" data-action="party" aria-label="Join party"><span>+</span><small>Join party</small></button>
+    </main>
+
+    <div class="bottom-left ui">
+      <a class="btn btn-ghost" id="cvLink" href="#" download>Download CV</a>
+      <button class="btn btn-ghost" type="button" data-action="quick">Quick View</button>
+    </div>
+
+    <div class="bottom-right ui">
+      <div class="mode">
+        <small>Mode</small>
+        <b>Career Story</b>
+        <span>Solo · ~2 min · Scroll to ride</span>
+      </div>
+      <button class="play" type="button" data-action="play"><span>Play</span></button>
+    </div>
+  </div>
+
+  <!-- ============ CAREER MODE ============ -->
+  <section id="careerMode" class="career" hidden>
+    <canvas id="road" class="road-canvas" aria-label="Career road"></canvas>
+    <div class="bike-wrap" id="bikeWrap"><div class="bike-shadow"></div><canvas id="bike" class="bike"></canvas></div>
+
+    <header class="career-hud">
+      <button class="btn" type="button" id="careerBack">◄ Lobby</button>
+      <div class="track">
+        <div class="track-bar"><span id="trackFill"></span></div>
+        <div class="track-marks" id="trackMarks"></div>
+      </div>
+    </header>
+
+    <aside class="chapter-card" id="chapterCard"></aside>
+
+    <div class="achievement" id="achievement"><i>🏆</i><div><small>Achievement unlocked</small><b></b></div></div>
+
+    <div class="scroll-hint" id="scrollHint">Scroll to ride<span>▼</span></div>
+
+    <div class="finish" id="finish" hidden>
+      <small>Career complete</small>
+      <b>Next level: your team</b>
+      <button class="play" type="button" id="finishParty"><span>Join party</span></button>
+    </div>
+  </section>
+  <div id="scrollSpace" class="scroll-space"></div>
+
+  <!-- ============ OVERLAYS ============ -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <div class="invite" id="invite" hidden>
+    <div class="invite-icon">+</div>
+    <div class="invite-text"><small>Party invite</small><b>Yasser invited you to the party</b></div>
+    <button class="btn btn-accept" type="button" data-action="accept">Accept</button>
+  </div>
+
+  <div class="modal" id="modal" hidden>
+    <div class="modal-backdrop" data-action="close"></div>
+    <section class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+      <button class="sheet-close" type="button" data-action="close" aria-label="Close">✕</button>
+      <div id="sheetBody"></div>
+    </section>
+  </div>
+
+  <video id="vidIdle" src="assets/idle.mp4" muted loop playsinline preload="auto" crossorigin="anonymous" hidden></video>
+  <video id="vidWave" src="assets/wave.mp4" muted playsinline preload="auto" crossorigin="anonymous" hidden></video>
+  <video id="vidRide" src="assets/ride.mp4" muted loop playsinline preload="auto" crossorigin="anonymous" hidden></video>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+# local editor / Claude preview config
+.claude/
+# large intermediate upscales (regenerate with Real-ESRGAN + tools/key_video.py)
+assets-source/*_2x.mp4
