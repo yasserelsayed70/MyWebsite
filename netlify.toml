@@ -1,8 +1,0 @@
-# The website lives in v2/. assets-source/ and tools/ are working files and are not published.
-[build]
-  publish = "v2"
-
-[[headers]]
-  for = "/assets/*"
-  [headers.values]
-    Cache-Control = "public, max-age=604800"
