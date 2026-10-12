@@ -170,7 +170,8 @@ export class Road {
     this.dpr = dpr;
   }
 
-  render(position, speed = 0) {
+  /** build: 0..1 world-construction progress (1 = fully built) */
+  render(position, speed = 0, build = 1) {
     this.resize();
     const { ctx, segments } = this;
     const w = this.canvas.width;
@@ -190,6 +191,17 @@ export class Road {
 
     this.drawSky(w, h, pal, playerSeg);
 
+    // construction: the world is built from the bike towards the horizon
+    const building = build < 1;
+    // starts slowly near the bike so the sweep is visible, then races to the horizon
+    const frontier = building ? DRAW * build ** 1.7 + 2 : Infinity;
+    const WIRE = 28; // segments just behind the frontier are still wireframe
+    if (building) {
+      ctx.fillStyle = `rgba(2,4,10,${Math.max(0, 1 - build * 1.5).toFixed(3)})`;
+      ctx.fillRect(0, 0, w, h);
+    }
+    let frontierY = null;
+
     // road, near to far
     let x = 0;
     let dx = -(base.curve * basePct);
@@ -203,8 +215,12 @@ export class Road {
       dx += seg.curve;
       seg.clip = maxy;
       seg.fog = 1 - Math.exp(-((n / DRAW) ** 2) * 4.5);
+      if (n > frontier) break;
       if (seg.p1.camera.z <= CAM_DEPTH || seg.p2.screen.y >= seg.p1.screen.y || seg.p2.screen.y >= maxy) continue;
-      this.drawSegment(seg, w);
+      if (building && n > frontier - WIRE) {
+        this.drawWire(seg, pal.accent, 1 - (n - (frontier - WIRE)) / WIRE);
+        frontierY = seg.p2.screen.y;
+      } else this.drawSegment(seg, w);
       maxy = seg.p2.screen.y;
     }
 
@@ -213,6 +229,9 @@ export class Road {
     for (let n = DRAW - 1; n > 0; n--) {
       const seg = segments[base.index + n];
       if (!seg || !seg.sprites.length || seg.p1.camera.z <= CAM_DEPTH) continue;
+      // while building, scenery grows up out of the ground behind the frontier
+      const grow = building ? Math.max(0, Math.min(1, (frontier - WIRE - n) / 18)) : 1;
+      if (grow <= 0) continue;
       const scale = seg.p1.screen.scale;
       const k = scale * this.S; // pixels per world unit at this depth
       for (const sp of seg.sprites) {
@@ -222,12 +241,44 @@ export class Road {
         ctx.beginPath();
         ctx.rect(0, 0, w, seg.clip);
         ctx.clip();
+        if (grow < 1) {
+          ctx.translate(sx, sy);
+          ctx.scale(1, grow);
+          ctx.translate(-sx, -sy);
+        }
         this.drawSprite(sp, sx, sy, k, seg.pal, seg.fog);
         ctx.restore();
       }
     }
 
+    if (building && frontierY !== null) {
+      // scan line sweeping forward where the world is being built
+      const g = ctx.createLinearGradient(0, frontierY - 30, 0, frontierY + 6);
+      g.addColorStop(0, rgb(pal.accent, 0));
+      g.addColorStop(0.8, rgb(pal.accent, 0.55));
+      g.addColorStop(1, rgb(mix(pal.accent, [255, 255, 255], 0.6), 0.9));
+      ctx.fillStyle = g;
+      ctx.fillRect(0, frontierY - 30, w, 36);
+    }
+
     this.drawSpeedLines(w, h, speed, pal);
+  }
+
+  drawWire(seg, accent, alpha) {
+    const { ctx } = this;
+    const { p1, p2 } = seg;
+    ctx.strokeStyle = rgb(accent, Math.max(0.15, alpha));
+    ctx.lineWidth = Math.max(1, p1.screen.w / 300);
+    ctx.beginPath();
+    for (const f of [-1.14, -1, -1 / 3, 1 / 3, 1, 1.14]) {
+      ctx.moveTo(p1.screen.x + p1.screen.w * f, p1.screen.y);
+      ctx.lineTo(p2.screen.x + p2.screen.w * f, p2.screen.y);
+    }
+    if (seg.index % 2 === 0) {
+      ctx.moveTo(p1.screen.x - p1.screen.w * 1.14, p1.screen.y);
+      ctx.lineTo(p1.screen.x + p1.screen.w * 1.14, p1.screen.y);
+    }
+    ctx.stroke();
   }
 
   drawSky(w, h, pal, seg) {

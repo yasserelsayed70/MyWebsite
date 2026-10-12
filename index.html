@@ -81,6 +81,16 @@
     </div>
   </div>
 
+  <!-- ============ MAP LOADING ============ -->
+  <div id="mapLoading" class="boot map-loading" hidden>
+    <div class="boot-inner">
+      <div class="boot-logo" data-text="CAREER ROAD">CAREER ROAD</div>
+      <div class="boot-lines" id="mapLines"></div>
+      <div class="boot-bar"><span id="mapBar"></span></div>
+      <p class="boot-tip" id="mapTip"></p>
+    </div>
+  </div>
+
   <!-- ============ CAREER MODE ============ -->
   <section id="careerMode" class="career" hidden>
     <canvas id="road" class="road-canvas" aria-label="Career road"></canvas>
@@ -106,7 +116,6 @@
       <button class="play" type="button" id="finishParty"><span>Join party</span></button>
     </div>
   </section>
-  <div id="scrollSpace" class="scroll-space"></div>
 
   <!-- ============ OVERLAYS ============ -->
   <div class="toast" id="toast" role="status" aria-live="polite"></div>

@@ -29,7 +29,7 @@ body {
 }
 button { font: inherit; color: inherit; cursor: pointer; }
 
-/* Scrollbars (page while riding, Quick View / party sheets) */
+/* Scrollbars (Quick View / party sheets) */
 @supports not selector(::-webkit-scrollbar) {
   /* Firefox; Chromium/Safari use the richer ::-webkit-scrollbar styles below */
   * { scrollbar-width: thin; scrollbar-color: var(--cyan) #060a14; }
@@ -54,6 +54,11 @@ a { color: var(--cyan); }
   transition: opacity .6s ease, visibility .6s;
 }
 .boot.done { opacity: 0; visibility: hidden; }
+.map-loading { z-index: 45; transition: opacity .35s ease, visibility .35s; }
+.map-loading .boot-logo { font-size: clamp(34px, 9vw, 56px); }
+/* while the world is being built, the HUD stays hidden */
+.career .career-hud, .career .chapter-card, .career .scroll-hint { transition: opacity .5s ease; }
+.career.building .career-hud, .career.building .chapter-card, .career.building .scroll-hint, .career.building .achievement { opacity: 0; pointer-events: none; }
 .boot-inner { width: min(460px, 86vw); }
 .boot-logo {
   position: relative;
@@ -429,11 +434,10 @@ a { color: var(--cyan); }
 .party-row .filled { border-color: var(--cyan); color: var(--text); background: rgba(57,240,224,.08); }
 
 /* ================= CAREER MODE ================= */
-body.riding { overflow-y: auto; }
-.scroll-space { height: 0; }
+html, body { overscroll-behavior: none; }
 .lobby { transition: opacity .4s ease; }
 body.riding .lobby { opacity: 0; pointer-events: none; }
-.career { position: fixed; inset: 0; z-index: 20; opacity: 0; transition: opacity .4s ease; }
+.career { position: fixed; inset: 0; z-index: 20; opacity: 0; transition: opacity .4s ease; touch-action: none; overscroll-behavior: none; user-select: none; -webkit-user-select: none; }
 .career.on { opacity: 1; }
 .road-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 
@@ -448,7 +452,7 @@ body.riding .lobby { opacity: 0; pointer-events: none; }
 .bike-shadow { position: absolute; left: 50%; bottom: 0; width: 70%; height: 8%; transform: translateX(-50%); border-radius: 50%; background: radial-gradient(ellipse, rgba(0,0,0,.65), transparent 70%); }
 
 .career-hud { position: absolute; top: 0; left: 0; right: 0; display: flex; align-items: center; gap: 24px; padding: 16px 24px; }
-.track { flex: 1; position: relative; padding-bottom: 18px; }
+.track { flex: 1; position: relative; padding-bottom: 18px; cursor: pointer; }
 .track-bar { height: 6px; background: rgba(255,255,255,.12); }
 .track-bar span { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--cyan-2), var(--cyan)); box-shadow: 0 0 10px var(--cyan); }
 .track-marks span { position: absolute; top: -3px; transform: translateX(-50%); font: 600 11px var(--display); letter-spacing: .1em; color: #fff; text-shadow: 0 1px 4px #000; padding-top: 14px; }
@@ -538,14 +542,23 @@ body.riding .lobby { opacity: 0; pointer-events: none; }
   .topbar { padding: 12px 16px; gap: 12px; }
   .tabs { display: none; }
   .region { display: none; }
-  .player-card { left: 16px; right: 16px; top: 64px; width: auto; padding: 12px 14px; }
-  .player-card h1 { font-size: 22px; }
-  .nameplate { font-size: 15px; padding: 6px 12px; top: -4%; }
-  .player-card .title { margin-bottom: 8px; font-size: 13px; }
-  .player-card .lvl, .player-card .chips { display: none; }
-  .stage { height: 56vh; bottom: 170px; }
+  /* compact but complete player card */
+  .player-card { left: 12px; right: 12px; top: 58px; width: auto; padding: 10px 12px 12px; }
+  .player-card .tag { font-size: 10px; }
+  .player-card h1 { font-size: 21px; margin: 2px 0 1px; }
+  .player-card .title { margin-bottom: 8px; font-size: 12.5px; }
+  .player-card .lvl { gap: 10px; margin-bottom: 8px; }
+  .lvl-badge { width: 38px; height: 38px; font-size: 16px; }
+  .lvl-badge small { font-size: 7px; }
+  .xp small { font-size: 9.5px; }
+  .xp-bar { height: 4px; margin-top: 4px; }
+  .chips { gap: 4px; }
+  .chip { font-size: 9.5px; padding: 4px 6px; letter-spacing: .05em; }
+  .nameplate { font-size: 14px; padding: 5px 11px; top: -9%; }
+  /* height/bottom are set by layoutStage() in main.js to fit between card and buttons */
+  .stage { height: 46vh; bottom: 170px; }
   .slot-l { display: none; }
-  .slot-r { left: auto; right: -10px; bottom: 34%; width: 72px; height: 92px; }
+  .slot-r { left: auto; right: calc((100% - 100vw) / 2 + 8px); bottom: 30%; width: 66px; height: 90px; } /* 8px from the screen edge */
   .slot-r span { font-size: 34px; }
   .slot-r small { font-size: 9px; letter-spacing: .12em; }
   .bottom-right { left: 16px; right: 16px; bottom: 16px; width: auto; }

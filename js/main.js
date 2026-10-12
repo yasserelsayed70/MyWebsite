@@ -178,6 +178,28 @@ async function enterLobby() {
   scheduleIdleGlitch();
 }
 
+/* ---------------- Phone layout ---------------- */
+
+// On phones the character fills the space between the player card and the
+// buttons, so the full card, the character and the buttons all fit on screen.
+const stage = $(".stage");
+function layoutStage() {
+  if (innerWidth > 760) {
+    stage.style.height = stage.style.bottom = "";
+    return;
+  }
+  const cardBottom = $("#playerCard").getBoundingClientRect().bottom;
+  const buttonsTop = $(".bottom-left").getBoundingClientRect().top;
+  const nameplate = 46; // room for the name above the head
+  const padBelow = 0.1; // the floor pad hangs ~10% of the stage height below the feet
+  const h = Math.max(180, (buttonsTop - cardBottom - nameplate - 8) / (1 + padBelow));
+  stage.style.height = `${Math.round(h)}px`;
+  stage.style.bottom = `${Math.round(innerHeight - buttonsTop + h * padBelow + 4)}px`;
+}
+layoutStage();
+addEventListener("resize", layoutStage);
+document.fonts?.ready.then(layoutStage);
+
 /* ---------------- Parallax ---------------- */
 
 window.addEventListener("pointermove", (e) => {
@@ -339,8 +361,18 @@ vidWave.addEventListener("ended", () => {
 const actions = {
   play: () => {
     if (careerMode.active) return;
-    burst(0.8, 220);
-    setTimeout(() => careerMode.start(), 200);
+    // fullscreen must be requested directly inside the click (not supported on iPhone, which is fine)
+    const root = document.documentElement;
+    if (!document.fullscreenElement && root.requestFullscreen) root.requestFullscreen({ navigationUI: "hide" }).catch(() => {});
+    // glitch the character out of the lobby, then load the map
+    if (!reduceMotion) {
+      fx.holo = 1;
+      animate(0.45, (p) => {
+        fx.reveal = 1 - p;
+        fx.glitch = 0.3 + 0.5 * Math.random();
+      }).then(() => (fx.glitch = 0));
+    }
+    setTimeout(() => careerMode.start(), reduceMotion ? 0 : 420);
   },
   locker: () => openSheet(`<h2 id="sheetTitle">Locker</h2><p class="sub">Equipped loadout</p><div class="loadout">${loadoutHTML()}</div>`),
   quick: () => openSheet(quickViewHTML()),
@@ -367,9 +399,10 @@ const careerMode = new CareerMode({
     // hide the character until the respawn starts, so the old frame never flashes
     Object.assign(fx, { glitch: 0, holo: 1, reveal: 0 });
     $("#invite").hidden = true;
+    // finishing the road opens the party panel straight away; the character respawns behind it
+    if (toParty) openSheet(partyHTML());
     await sleep(450);
     await spawn();
-    if (toParty) joinParty();
   },
 });
 
