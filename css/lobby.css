@@ -406,16 +406,24 @@ a { color: var(--cyan); }
   position: relative;
   width: min(860px, calc(100vw - 32px));
   max-height: calc(100vh - 48px);
-  overflow: auto;
+  max-height: calc(100dvh - 48px);
+  display: flex; flex-direction: column;
+  overflow: hidden; /* only #sheetBody scrolls, so the close button never scrolls away */
   background: linear-gradient(180deg, #0d1628, #0a111f);
   border: 1px solid var(--panel-line);
-  padding: 32px;
   animation: sheetIn .35s cubic-bezier(.2,.8,.2,1);
 }
+#sheetBody { overflow-y: auto; padding: 32px; overscroll-behavior: contain; }
 @keyframes sheetIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
-.sheet-close { position: absolute; right: 14px; top: 12px; background: none; border: 0; font-size: 20px; color: var(--muted); }
-.sheet-close:hover { color: var(--text); }
-.sheet h2 { font: 700 28px var(--display); margin: 0 0 4px; letter-spacing: .03em; }
+.sheet-close {
+  position: absolute; right: 12px; top: 12px; z-index: 2;
+  width: 40px; height: 40px; display: grid; place-content: center;
+  background: rgba(10, 17, 31, .92); border: 1px solid var(--panel-line);
+  font-size: 18px; color: var(--muted);
+  transition: color .2s, border-color .2s;
+}
+.sheet-close:hover { color: var(--text); border-color: var(--cyan); }
+.sheet h2 { font: 700 28px var(--display); margin: 0 0 4px; letter-spacing: .03em; padding-right: 48px; }
 .sheet h3 { font: 600 13px var(--display); letter-spacing: .2em; color: var(--cyan); text-transform: uppercase; margin: 28px 0 10px; }
 .sheet p, .sheet li { color: #c9d7e8; line-height: 1.6; font-size: 14.5px; }
 .sheet .sub { color: var(--muted); margin: 0 0 6px; }
@@ -568,7 +576,8 @@ body.riding .lobby { opacity: 0; pointer-events: none; }
   .bottom-left > * { flex: 1; }
   .bottom-left .btn { width: 100%; text-align: center; padding: 11px 8px; font-size: 12px; }
   .invite { top: 64px; bottom: auto; }
-  .sheet { padding: 24px 18px; }
+  #sheetBody { padding: 22px 16px; }
+  .sheet h2 { padding-right: 44px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
