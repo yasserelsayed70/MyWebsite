@@ -2,6 +2,7 @@
 import { road as roadData, career, projects } from "./career.js";
 import { Road } from "./road.js";
 import { CharacterView } from "./character.js";
+import { track } from "./analytics.js";
 
 const $ = (sel) => document.querySelector(sel);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
@@ -29,7 +30,10 @@ export class CareerMode {
     this.bindInput();
     $("#road").addEventListener("click", (e) => {
       const link = this.road.hitTest(e.offsetX, e.offsetY);
-      if (link) window.open(link, "_blank", "noopener");
+      if (link) {
+        track("billboard_click", { link });
+        window.open(link, "_blank", "noopener");
+      }
     });
     $("#road").addEventListener("mousemove", (e) => {
       $("#road").style.cursor = this.road.hitTest(e.offsetX, e.offsetY) ? "pointer" : "";
@@ -121,6 +125,8 @@ export class CareerMode {
     this.pos = this.target = 0;
     this.chapter = null;
     this.unlocked.clear();
+    this.seenChapters = new Set();
+    this.completed = false;
     $("#scrollHint").classList.remove("gone");
     $("#finish").hidden = true;
     this.video.play().catch(() => {});
@@ -169,6 +175,7 @@ export class CareerMode {
   }
 
   exit(toParty) {
+    track("ride_exit", { reached: `${Math.round(this.road.state(this.pos).progress * 100)}%`, finished: toParty });
     this.active = false;
     $("#mapLoading").hidden = true;
     this.el.classList.remove("on");
@@ -229,9 +236,17 @@ export class CareerMode {
       if (job?.achievement) this.achievement(job.achievement);
     }
     $("#finish").hidden = st.progress < 0.985;
+    if (!$("#finish").hidden && !this.completed) {
+      this.completed = true;
+      track("ride_complete");
+    }
   }
 
   showChapter(i) {
+    if (i >= 0 && !this.seenChapters.has(i)) {
+      this.seenChapters.add(i);
+      track("chapter_reached", { chapter: `${i + 1} · ${career.find((j) => j.id === roadData[i].career).company}` });
+    }
     const card = $("#chapterCard");
     if (i < 0) {
       card.classList.remove("show");

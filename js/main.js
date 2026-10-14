@@ -1,6 +1,7 @@
 import { profile, loadout, career, sideProjects, loadingTips } from "./career.js";
 import { CharacterView } from "./character.js";
 import { CareerMode } from "./careerMode.js";
+import { track, setContext } from "./analytics.js";
 
 const $ = (sel) => document.querySelector(sel);
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -277,7 +278,10 @@ function toast(msg) {
 /* ---------------- Modal sheets ---------------- */
 
 const modal = $("#modal");
-function openSheet(html) {
+let openPanel = null;
+function openSheet(html, name) {
+  openPanel = name;
+  track("panel_open", { panel: name });
   $("#sheetBody").innerHTML = html;
   modal.hidden = false;
   modal.querySelector(".sheet-close").focus();
@@ -374,12 +378,12 @@ const actions = {
     }
     setTimeout(() => careerMode.start(), reduceMotion ? 0 : 420);
   },
-  locker: () => openSheet(`<h2 id="sheetTitle">Locker</h2><p class="sub">Equipped loadout</p><div class="loadout">${loadoutHTML()}</div>`),
-  quick: () => openSheet(quickViewHTML()),
+  locker: () => openSheet(`<h2 id="sheetTitle">Locker</h2><p class="sub">Equipped loadout</p><div class="loadout">${loadoutHTML()}</div>`, "locker"),
+  quick: () => openSheet(quickViewHTML(), "quick_view"),
   party: joinParty,
   accept: () => {
     $("#invite").hidden = true;
-    openSheet(partyHTML());
+    openSheet(partyHTML(), "party");
   },
   close: closeSheet,
 };
@@ -394,13 +398,16 @@ document.addEventListener("keydown", (e) => {
 
 /* ---------------- Career mode ---------------- */
 
+// tells the click tracker where a click happened
+setContext(() => (!modal.hidden ? `panel_${openPanel}` : careerMode.active ? "road" : "lobby"));
+
 const careerMode = new CareerMode({
   onExit: async (toParty) => {
     // hide the character until the respawn starts, so the old frame never flashes
     Object.assign(fx, { glitch: 0, holo: 1, reveal: 0 });
     $("#invite").hidden = true;
     // finishing the road opens the party panel straight away; the character respawns behind it
-    if (toParty) openSheet(partyHTML());
+    if (toParty) openSheet(partyHTML(), "party_after_ride");
     await sleep(450);
     await spawn();
   },
