@@ -339,7 +339,6 @@ function contactHTML() {
   return `<div class="contact-grid">
       <a class="btn" href="mailto:${profile.email}">Email<small>${esc(profile.email)}</small></a>
       <a class="btn" href="${profile.linkedin}" target="_blank" rel="noopener">LinkedIn<small>yasserbadrdev</small></a>
-      <a class="btn" href="${profile.github}" target="_blank" rel="noopener">GitHub<small>yasserelsayed70</small></a>
     </div>`;
 }
 
@@ -347,7 +346,6 @@ const ICONS = {
   mail: `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>`,
   linkedin: `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 10v7M8 7v.01M12 17v-4a2 2 0 0 1 4 0v4M12 10v7"/></svg>`,
   cv: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M12 10v7m-3-3 3 3 3-3"/></svg>`,
-  code: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></svg>`,
   copy: `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/></svg>`,
   arrow: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5"/></svg>`,
 };
@@ -383,7 +381,6 @@ function partyHTML() {
         </div>
         ${action("", profile.linkedin, "linkedin", "Connect on LinkedIn", "linkedin.com/in/yasserbadrdev", "Open", 'target="_blank" rel="noopener"')}
         ${action("", profile.cv, "cv", "Download the CV", "One-page PDF", "Get", "download")}
-        ${action("", profile.github, "code", "See the code", "github.com/yasserelsayed70", "Open", 'target="_blank" rel="noopener"')}
       </div>
     </div>`;
 }

@@ -13,7 +13,6 @@ export const profile = {
     "server-authoritative gameplay with Photon Fusion, client-side prediction and lag compensation, dedicated servers and matchmaking on PlayFab, and Steam integration.",
   email: "yasserelsayed70@gmail.com",
   linkedin: "https://www.linkedin.com/in/yasserbadrdev",
-  github: "https://github.com/yasserelsayed70",
   cv: "cv/Yasser_Badr_CV.pdf",
   languages: [
     ["Arabic", "Native"],

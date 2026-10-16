@@ -50,7 +50,6 @@ document.addEventListener(
       if (href.endsWith(".pdf")) name = "cv_download";
       else if (href.startsWith("mailto:")) name = "contact_email";
       else if (href.includes("linkedin.com")) name = "contact_linkedin";
-      else if (href.includes("github.com")) name = "contact_github";
       else if (href.includes("youtube.com") || href.includes("steampowered.com")) name = "project_link";
       else name = "link_click";
       track(name, { from, label: el.textContent.trim().slice(0, 40) });
