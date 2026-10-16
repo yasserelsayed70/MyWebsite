@@ -288,20 +288,85 @@ function openSheet(html, name, { viaHistory = "push" } = {}) {
   modal.dataset.panel = name.startsWith("party") ? "party" : name; // party uses its own layout
   modal.classList.remove("closing");
   clearTimeout(closeTimer);
+  sheet.style.animation = sheet.style.transition = sheet.style.transform = "";
+  backdrop.style.opacity = "";
   $("#sheetBody").innerHTML = html;
   modal.hidden = false;
+  $("#sheetBody").scrollTop = 0; // always open at the top (must run after showing it)
   modal.querySelector(".sheet-close").focus();
 }
 onBack("panel", () => closeSheet({ fromBack: true }));
 
+/* ---------------- Drag down to close (phone bottom sheets) ----------------
+   Pull the handle down at any time, or swipe down on the content when it is
+   already scrolled to the top. Far enough (or a quick flick) closes the sheet. */
+const sheet = modal.querySelector(".sheet");
+const sheetBody = $("#sheetBody");
+const backdrop = modal.querySelector(".modal-backdrop");
+const phone = matchMedia("(max-width: 760px)");
+let drag = null;
+
+sheet.addEventListener("touchstart", (e) => {
+  if (!phone.matches || e.target.closest(".sheet-close") || modal.classList.contains("closing")) return;
+  const fromHandle = !!e.target.closest(".sheet-grab");
+  drag = { y0: e.touches[0].clientY, t0: performance.now(), dy: 0, active: false, fromHandle };
+}, { passive: true });
+
+sheet.addEventListener("touchmove", (e) => {
+  if (!drag) return;
+  const dy = e.touches[0].clientY - drag.y0;
+  if (!drag.active) {
+    const atTop = sheetBody.scrollTop <= 0;
+    if (dy > 6 && (drag.fromHandle || atTop)) {
+      drag.active = true;
+      drag.y0 = e.touches[0].clientY; // start following from here, no jump
+      sheet.style.animation = "none";
+      sheet.style.transition = "none";
+    } else if (dy < -6 || (!drag.fromHandle && !atTop)) {
+      drag = null; // normal scrolling of the content
+      return;
+    }
+    return;
+  }
+  e.preventDefault();
+  drag.dy = Math.max(0, e.touches[0].clientY - drag.y0);
+  sheet.style.transform = `translateY(${drag.dy}px)`;
+  backdrop.style.opacity = String(Math.max(0.2, 1 - drag.dy / sheet.offsetHeight));
+}, { passive: false });
+
+const endDrag = () => {
+  if (!drag) return;
+  const { active, dy, t0 } = drag;
+  drag = null;
+  if (!active) return;
+  const speed = dy / Math.max(performance.now() - t0, 1); // px per ms
+  if (dy > Math.min(160, sheet.offsetHeight * 0.3) || (speed > 0.6 && dy > 40)) {
+    backdrop.style.opacity = "";
+    closeSheet({ dragged: true });
+  } else {
+    // not far enough: spring back up
+    sheet.style.transition = "transform .25s cubic-bezier(.2,.8,.2,1)";
+    sheet.style.transform = "";
+    backdrop.style.opacity = "";
+  }
+};
+sheet.addEventListener("touchend", endDrag);
+sheet.addEventListener("touchcancel", endDrag);
+
 // plays the opening animation in reverse (slides down on phones), then hides
 let closeTimer;
-function closeSheet({ fromBack = false } = {}) {
+function closeSheet({ fromBack = false, dragged = false } = {}) {
   if (modal.hidden || modal.classList.contains("closing")) return;
   if (!fromBack) popLayer("panel");
   if (reduceMotion) {
     modal.hidden = true;
     return;
+  }
+  if (dragged) {
+    // finish the swipe from where the finger let go instead of restarting the animation
+    sheet.style.animation = "none";
+    sheet.style.transition = "transform .24s cubic-bezier(.4,0,1,1)";
+    sheet.style.transform = "translateY(100%)";
   }
   modal.classList.add("closing");
   closeTimer = setTimeout(() => {
