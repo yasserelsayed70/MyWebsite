@@ -3,6 +3,8 @@
 // front of the camera to the screen, from near to far, then draw roadside
 // sprites from far to near so closer ones cover farther ones.
 
+import { perf, maxDpr } from "./perf.js";
+
 const SEG = 200; // segment length (world units)
 const ROAD_W = 2000; // half road width
 const CAM_H = 1000; // camera height above the road
@@ -160,7 +162,7 @@ export class Road {
   /* ---------- drawing ---------- */
 
   resize() {
-    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    const dpr = maxDpr(1.5);
     const w = Math.round(this.canvas.clientWidth * dpr);
     const h = Math.round(this.canvas.clientHeight * dpr);
     if (this.canvas.width !== w || this.canvas.height !== h) {
@@ -427,7 +429,7 @@ export class Road {
         const c = sp.hue ? [255, 45, 140] : [57, 240, 224];
         ctx.fillStyle = rgb(c);
         ctx.shadowColor = rgb(c);
-        ctx.shadowBlur = Math.min(30, 20 * k * 40);
+        ctx.shadowBlur = perf.lite ? 0 : Math.min(30, 20 * k * 40);
         ctx.fillRect(x - pw / 2, y - ph, pw, ph);
         ctx.shadowBlur = 0;
         break;
@@ -590,7 +592,7 @@ export class Road {
 
   drawSpeedLines(w, h, speed, pal) {
     const s = Math.min(Math.abs(speed) / 9000, 1);
-    if (s < 0.08) return;
+    if (s < 0.08 || perf.lite) return;
     const { ctx } = this;
     const r = seeded(Math.floor(performance.now() / 50));
     ctx.strokeStyle = rgb(mix(pal.accent, [255, 255, 255], 0.5), 0.35 * s);

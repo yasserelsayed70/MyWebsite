@@ -1,5 +1,6 @@
 // Draws a "stacked alpha" video (colour on top, alpha mask below) into a
 // WebGL canvas, with hologram / glitch effects used for the spawn animation.
+import { maxDpr } from "./perf.js";
 
 const VERT = `
 attribute vec2 a_pos;
@@ -108,11 +109,23 @@ export class CharacterView {
   }
 
   setVideo(video) {
+    if (this.video === video) return;
     this.video = video;
+    this.dirty = true;
+    // the video has ~24 new frames a second but the screen refreshes ~60 times:
+    // only upload a frame to the GPU when the video actually produced a new one
+    if ("requestVideoFrameCallback" in video) {
+      const onFrame = () => {
+        this.dirty = true;
+        if (this.video === video) video.requestVideoFrameCallback(onFrame);
+      };
+      video.requestVideoFrameCallback(onFrame);
+      this.frameCallbacks = true;
+    } else this.frameCallbacks = false;
   }
 
   resize() {
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const dpr = maxDpr(2);
     const w = Math.round(this.canvas.clientWidth * dpr);
     const h = Math.round(this.canvas.clientHeight * dpr);
     if (this.canvas.width !== w || this.canvas.height !== h) {
@@ -127,9 +140,20 @@ export class CharacterView {
     gl.viewport(0, 0, this.canvas.width, this.canvas.height);
     gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT);
-    if (!video || video.readyState < 2) return;
+    if (!video) return;
+    // When a looping video jumps back to the start (or a new clip is swapped in)
+    // the browser briefly has no frame ready. Keep drawing the last frame we have
+    // instead of an empty canvas, otherwise the character blinks out for a frame.
+    const ready = video.readyState >= 2;
+    if (!ready && !this.uploaded) return;
     gl.bindTexture(gl.TEXTURE_2D, this.tex);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, video);
+    const fresh = this.frameCallbacks ? this.dirty : video.currentTime !== this.lastTime;
+    if (ready && (fresh || !this.uploaded)) {
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, video);
+      this.uploaded = true;
+      this.dirty = false;
+      this.lastTime = video.currentTime;
+    }
     gl.uniform1f(this.loc.time, time);
     gl.uniform1f(this.loc.glitch, this.uniforms.glitch);
     gl.uniform1f(this.loc.holo, this.uniforms.holo);

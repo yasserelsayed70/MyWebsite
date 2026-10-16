@@ -411,7 +411,25 @@ a { color: var(--cyan); }
 .btn-accept:hover { background: #7ff8ee; }
 
 .modal { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; }
-.modal-backdrop { position: absolute; inset: 0; background: rgba(3, 6, 12, .75); backdrop-filter: blur(6px); animation: fadeIn .3s ease; }
+.modal-backdrop { position: absolute; inset: 0; background: rgba(3, 6, 12, .86); animation: fadeIn .3s ease; }
+@media (min-width: 761px) {
+  html:not(.lite) .modal-backdrop { background: rgba(3, 6, 12, .75); backdrop-filter: blur(6px); }
+}
+/* the sheet is solid, so cards inside it don't need their own blur */
+.sheet .item { backdrop-filter: none; }
+/* pause decorative CSS animations behind an open panel */
+body.panel-open .lobby *, body.panel-open .lobby *::before, body.panel-open .lobby *::after { animation-play-state: paused !important; }
+.modal .sheet { will-change: transform; }
+
+/* ---------- lite mode (budget devices) ---------- */
+.lite * { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+.lite .bg-beams, .lite .bg-dust { display: none; }
+.lite .bg-floor { animation: none; }
+.lite .pad-arcs, .lite .pad-ticks, .lite .pad-pulse { animation: none; }
+.lite .play::after { display: none; }
+.lite .play, .lite .invite, .lite .finish, .lite .leave-box, .lite .modal[data-panel="party"] .sheet { box-shadow: none; }
+.lite .p-action:hover, .lite .p-action.primary:hover { box-shadow: none; }
+.lite .player-card, .lite .item, .lite .mode, .lite .btn, .lite .chapter-card { background-color: rgba(12, 20, 36, .94); }
 .modal.closing .modal-backdrop { animation: fadeOut .3s ease forwards; }
 .modal.closing .sheet { animation: sheetOut .25s ease-in forwards; }
 @keyframes fadeIn { from { opacity: 0; } }

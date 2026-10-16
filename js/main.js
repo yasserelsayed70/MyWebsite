@@ -3,6 +3,7 @@ import { CharacterView } from "./character.js";
 import { CareerMode } from "./careerMode.js";
 import { track, setContext } from "./analytics.js";
 import { pushLayer, popLayer, replaceTop, onBack, topLayer } from "./nav.js";
+import { perf, setLite, measureFps } from "./perf.js";
 
 const $ = (sel) => document.querySelector(sel);
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -74,6 +75,11 @@ $("#bootSkip").addEventListener("click", () => (skipped = true));
 
 async function boot() {
   const assets = videoReady(vidIdle); // the wave clip keeps loading in the background
+  // a slow device can't keep up even with the simple loading screen -> lite mode
+  measureFps(1500).then((fps) => {
+    if (fps < 40) setLite(true);
+    track("perf_tier", { lite: perf.lite, fps: Math.round(fps) });
+  });
   for (let i = 0; i < steps.length; i++) {
     if (skipped) break;
     const line = document.createElement("div");
@@ -149,7 +155,7 @@ function loop() {
       a.resolve();
     }
   }
-  if (view && !careerMode.active) {
+  if (view && !careerMode.active && !panelOpen()) {
     Object.assign(view.uniforms, fx);
     view.render(t);
   }
@@ -231,7 +237,10 @@ window.addEventListener("pointermove", (e) => {
   }
   resize();
   addEventListener("resize", resize);
-  (function tick() {
+  // starts on the next frame: careerMode is created further down this file
+  requestAnimationFrame(function tick() {
+    requestAnimationFrame(tick);
+    if (perf.lite || panelOpen() || careerMode.active) return;
     ctx.clearRect(0, 0, c.width, c.height);
     for (const p of parts) {
       if (!reduceMotion) {
@@ -243,8 +252,7 @@ window.addEventListener("pointermove", (e) => {
       ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
       ctx.fill();
     }
-    requestAnimationFrame(tick);
-  })();
+  });
 })();
 
 /* ---------------- Real ping ---------------- */
@@ -264,6 +272,19 @@ async function measurePing() {
 }
 measurePing();
 setInterval(measurePing, 5000);
+
+/* ---------------- Pause the lobby behind panels ----------------
+   A panel covers the lobby, so the character video, dust and CSS animations
+   behind it are wasted work; pausing them keeps panel animations smooth. */
+
+function panelOpen() {
+  return !$("#modal").hidden;
+}
+function setLobbyPaused(paused) {
+  document.body.classList.toggle("panel-open", paused);
+  if (paused) vidIdle.pause();
+  else if (activeVideo === vidIdle && !careerMode.active) vidIdle.play().catch(() => {});
+}
 
 /* ---------------- Toast ---------------- */
 
@@ -292,6 +313,7 @@ function openSheet(html, name, { viaHistory = "push" } = {}) {
   backdrop.style.opacity = "";
   $("#sheetBody").innerHTML = html;
   modal.hidden = false;
+  setLobbyPaused(true);
   $("#sheetBody").scrollTop = 0; // always open at the top (must run after showing it)
   modal.querySelector(".sheet-close").focus();
 }
@@ -360,6 +382,7 @@ function closeSheet({ fromBack = false, dragged = false } = {}) {
   if (!fromBack) popLayer("panel");
   if (reduceMotion) {
     modal.hidden = true;
+    setLobbyPaused(false);
     return;
   }
   if (dragged) {
@@ -372,6 +395,7 @@ function closeSheet({ fromBack = false, dragged = false } = {}) {
   closeTimer = setTimeout(() => {
     modal.hidden = true;
     modal.classList.remove("closing");
+    setLobbyPaused(false);
   }, 320);
 }
 
