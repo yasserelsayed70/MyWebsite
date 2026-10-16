@@ -2,6 +2,7 @@ import { profile, loadout, career, sideProjects, loadingTips } from "./career.js
 import { CharacterView } from "./character.js";
 import { CareerMode } from "./careerMode.js";
 import { track, setContext } from "./analytics.js";
+import { pushLayer, popLayer, replaceTop, onBack, topLayer } from "./nav.js";
 
 const $ = (sel) => document.querySelector(sel);
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -279,15 +280,34 @@ function toast(msg) {
 
 const modal = $("#modal");
 let openPanel = null;
-function openSheet(html, name) {
+function openSheet(html, name, { viaHistory = "push" } = {}) {
+  // Back button closes the panel: add a history entry unless one is already there
+  if (topLayer() !== "panel") viaHistory === "replace" ? replaceTop("panel") : pushLayer("panel");
   openPanel = name;
   track("panel_open", { panel: name });
+  modal.dataset.panel = name.startsWith("party") ? "party" : name; // party uses its own layout
+  modal.classList.remove("closing");
+  clearTimeout(closeTimer);
   $("#sheetBody").innerHTML = html;
   modal.hidden = false;
   modal.querySelector(".sheet-close").focus();
 }
-function closeSheet() {
-  modal.hidden = true;
+onBack("panel", () => closeSheet({ fromBack: true }));
+
+// plays the opening animation in reverse (slides down on phones), then hides
+let closeTimer;
+function closeSheet({ fromBack = false } = {}) {
+  if (modal.hidden || modal.classList.contains("closing")) return;
+  if (!fromBack) popLayer("panel");
+  if (reduceMotion) {
+    modal.hidden = true;
+    return;
+  }
+  modal.classList.add("closing");
+  closeTimer = setTimeout(() => {
+    modal.hidden = true;
+    modal.classList.remove("closing");
+  }, 320);
 }
 
 function quickViewHTML() {
@@ -323,20 +343,49 @@ function contactHTML() {
     </div>`;
 }
 
+const ICONS = {
+  mail: `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>`,
+  linkedin: `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 10v7M8 7v.01M12 17v-4a2 2 0 0 1 4 0v4M12 10v7"/></svg>`,
+  cv: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M12 10v7m-3-3 3 3 3-3"/></svg>`,
+  code: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></svg>`,
+  copy: `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/></svg>`,
+  arrow: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5"/></svg>`,
+};
+
 function partyHTML() {
+  const subject = encodeURIComponent("Let's team up");
+  const action = (cls, href, icon, title, text, cta, extra = "") => `
+    <a class="p-action ${cls}" href="${href}" ${extra}>
+      <span class="p-icon">${ICONS[icon]}</span>
+      <span class="p-text"><b>${title}</b><small>${text}</small></span>
+      <span class="p-cta">${cta}${ICONS.arrow}</span>
+    </a>`;
   return `
-    <h2 id="sheetTitle">You joined the party</h2>
-    <p class="sub">Squad up with ${esc(profile.name)} — ${esc(profile.title)}.</p>
-    <div class="party-row">
-      <div class="filled">${esc(profile.name)}</div>
-      <div class="filled">You</div>
-      <div>Open slot</div>
-      <div>Open slot</div>
-    </div>
-    <h3>Start the conversation</h3>
-    ${contactHTML()}
-    <h3>Grab the CV</h3>
-    <div class="contact-grid"><a class="btn" href="${profile.cv}" download>Download CV</a></div>`;
+    <div class="party">
+      <header class="party-head">
+        <span class="party-badge"><i></i> Party joined</span>
+        <h2 id="sheetTitle">You're in the squad</h2>
+        <p>Start the conversation with ${esc(profile.name)}, ${esc(profile.title)}. ${esc(profile.relocation)}.</p>
+      </header>
+
+      <div class="party-lineup" aria-label="Party: ${esc(profile.name)}, you, two open slots">
+        <div class="member leader"><span class="avatar" style="background-image:url(assets/idle-poster.webp)"></span><b>${esc(profile.name.split(" ")[0])}</b><small>Leader</small></div>
+        <div class="member you"><span class="avatar">YOU</span><b>You</b><small>Joined</small></div>
+        <div class="member open"><span class="avatar">+</span><b>Open</b><small>Your team?</small></div>
+        <div class="member open"><span class="avatar">+</span><b>Open</b><small>Slot</small></div>
+      </div>
+
+      <h3 class="party-label">Pick how to connect</h3>
+      <div class="party-actions">
+        <div class="p-email">
+          ${action("primary", `mailto:${profile.email}?subject=${subject}`, "mail", "Send an email", esc(profile.email), "Write")}
+          <button class="p-copy" type="button" data-action="copyEmail" aria-label="Copy email address">${ICONS.copy}<span>Copy</span></button>
+        </div>
+        ${action("", profile.linkedin, "linkedin", "Connect on LinkedIn", "linkedin.com/in/yasserbadrdev", "Open", 'target="_blank" rel="noopener"')}
+        ${action("", profile.cv, "cv", "Download the CV", "One-page PDF", "Get", "download")}
+        ${action("", profile.github, "code", "See the code", "github.com/yasserelsayed70", "Open", 'target="_blank" rel="noopener"')}
+      </div>
+    </div>`;
 }
 
 /* ---------------- Join party ---------------- */
@@ -386,6 +435,14 @@ const actions = {
     openSheet(partyHTML(), "party");
   },
   close: closeSheet,
+  copyEmail: async () => {
+    try {
+      await navigator.clipboard.writeText(profile.email);
+      toast("Email copied: " + profile.email);
+    } catch {
+      toast(profile.email);
+    }
+  },
 };
 
 document.addEventListener("click", (e) => {
@@ -394,6 +451,11 @@ document.addEventListener("click", (e) => {
 });
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") closeSheet();
+  // keyboard users can open the locker from the focused character
+  if ((e.key === "Enter" || e.key === " ") && e.target.id === "character") {
+    e.preventDefault();
+    actions.locker();
+  }
 });
 
 /* ---------------- Career mode ---------------- */
@@ -407,7 +469,8 @@ const careerMode = new CareerMode({
     Object.assign(fx, { glitch: 0, holo: 1, reveal: 0 });
     $("#invite").hidden = true;
     // finishing the road opens the party panel straight away; the character respawns behind it
-    if (toParty) openSheet(partyHTML(), "party_after_ride");
+    // the road's history entry becomes the panel's, so Back then closes the panel
+    if (toParty) openSheet(partyHTML(), "party_after_ride", { viaHistory: "replace" });
     await sleep(450);
     await spawn();
   },

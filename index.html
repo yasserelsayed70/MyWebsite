@@ -45,6 +45,9 @@
         <button class="tab" type="button" data-action="quick">Quick View</button>
       </nav>
       <div class="status">
+        <button class="locker-btn" type="button" data-action="locker" aria-label="Open locker (loadout)">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M12 3v18M9 10v2M15 10v2"/></svg>Locker
+        </button>
         <span class="ping" id="ping" title="Your real latency to this site"><i></i><b id="pingVal">--</b> ms</span>
         <span class="region">EU</span>
       </div>
@@ -59,8 +62,8 @@
 
     <main class="stage">
       <div class="pad" id="pad"><i class="pad-glow"></i><i class="pad-ticks"></i><i class="pad-ring"></i><i class="pad-arcs"></i><i class="pad-pulse"></i><i class="pad-flash"></i></div>
-      <canvas id="character" class="character" aria-label="Yasser Badr as a game character"></canvas>
-      <img id="characterFallback" class="character fallback" src="assets/idle-poster.webp" alt="Yasser Badr as a game character" hidden />
+      <canvas id="character" class="character" data-action="locker" role="button" tabindex="0" title="Inspect loadout" aria-label="Yasser Badr as a game character. Open the locker"></canvas>
+      <img id="characterFallback" class="character fallback" data-action="locker" src="assets/idle-poster.webp" alt="Yasser Badr as a game character" hidden />
       <div class="nameplate"><span class="ready">●</span> <b id="nameplate"></b></div>
       <button class="slot slot-l ui" type="button" data-action="party" aria-label="Join party"><span>+</span><small>Join party</small></button>
       <button class="slot slot-r ui" type="button" data-action="party" aria-label="Join party"><span>+</span><small>Join party</small></button>
@@ -105,6 +108,18 @@
     </header>
 
     <aside class="chapter-card" id="chapterCard"></aside>
+
+    <div class="leave" id="leaveConfirm" hidden role="dialog" aria-modal="true" aria-labelledby="leaveTitle">
+      <div class="leave-box">
+        <small>Paused</small>
+        <b id="leaveTitle">Leave the ride?</b>
+        <p>You'll go back to the lobby. The road starts again next time.</p>
+        <div class="leave-actions">
+          <button class="btn" type="button" id="keepRiding">Keep riding</button>
+          <button class="btn btn-accept" type="button" id="leaveRide">Back to lobby</button>
+        </div>
+      </div>
+    </div>
 
     <div class="achievement" id="achievement"><i>🏆</i><div><small>Achievement unlocked</small><b></b></div></div>
 

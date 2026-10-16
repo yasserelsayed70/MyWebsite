@@ -3,6 +3,7 @@ import { road as roadData, career, projects } from "./career.js";
 import { Road } from "./road.js";
 import { CharacterView } from "./character.js";
 import { track } from "./analytics.js";
+import { pushLayer, popLayer, replaceTop, onBack } from "./nav.js";
 
 const $ = (sel) => document.querySelector(sel);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
@@ -38,8 +39,16 @@ export class CareerMode {
     $("#road").addEventListener("mousemove", (e) => {
       $("#road").style.cursor = this.road.hitTest(e.offsetX, e.offsetY) ? "pointer" : "";
     });
-    $("#careerBack").addEventListener("click", () => this.exit(false));
+    $("#careerBack").addEventListener("click", () => this.askLeave());
     $("#finishParty").addEventListener("click", () => this.exit(true));
+    $("#keepRiding").addEventListener("click", () => this.hideLeave());
+    $("#leaveRide").addEventListener("click", () => this.exit(false));
+    // phone / browser Back while riding: pause and ask (Back again = keep riding)
+    onBack("road", () => {
+      pushLayer("road");
+      if (this.leaveOpen) this.hideLeave();
+      else this.askLeave();
+    });
   }
 
   buildHud() {
@@ -61,7 +70,7 @@ export class CareerMode {
     this.vel = 0;
     this.touching = false;
     const nudge = (dy) => {
-      if (!this.active || this.building) return;
+      if (!this.active || this.building || this.leaveOpen) return;
       this.target = Math.max(0, Math.min(this.road.maxPosition, this.target + dy * PER_PX));
       if (this.target > 400) $("#scrollHint").classList.add("gone");
     };
@@ -98,7 +107,7 @@ export class CareerMode {
       if (e.key in keys) { e.preventDefault(); nudge(keys[e.key]); }
       if (e.key === "Home") { e.preventDefault(); this.target = 0; }
       if (e.key === "End") { e.preventDefault(); this.target = this.road.maxPosition; }
-      if (e.key === "Escape" && !document.fullscreenElement) this.exit(false);
+      if (e.key === "Escape" && !document.fullscreenElement) this.leaveOpen ? this.hideLeave() : this.askLeave();
     });
 
     // tap/click the progress bar to jump to a chapter
@@ -131,6 +140,7 @@ export class CareerMode {
     $("#finish").hidden = true;
     this.video.play().catch(() => {});
 
+    pushLayer("road");
     this.buildStart = performance.now();
     this.building = !reduceMotion;
     this.el.classList.toggle("building", this.building);
@@ -174,7 +184,23 @@ export class CareerMode {
     await new Promise((r) => setTimeout(r, 180));
   }
 
+  askLeave() {
+    if (!this.active) return;
+    this.leaveOpen = true;
+    this.vel = 0;
+    $("#leaveConfirm").hidden = false;
+    $("#keepRiding").focus();
+  }
+
+  hideLeave() {
+    this.leaveOpen = false;
+    $("#leaveConfirm").hidden = true;
+  }
+
   exit(toParty) {
+    this.hideLeave();
+    // remove the road's history entry; the party panel reuses it instead
+    if (!toParty) popLayer("road");
     track("ride_exit", { reached: `${Math.round(this.road.state(this.pos).progress * 100)}%`, finished: toParty });
     this.active = false;
     $("#mapLoading").hidden = true;
